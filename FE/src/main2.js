@@ -4,20 +4,47 @@ import javascriptLogo from "./javascript.svg";
 import viteLogo from "/vite.svg";
 import { setupCounter } from "./counter.js";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
-async function postData(bookingId) {
+async function batalBooking(bookingId) {
     try {
-      const response = await axios.post("http://localhost:5000/proxy/batal", {
-        bookingId,
-      });
-      console.log("Response:", response.data);
+        const response = await axios.post("http://localhost:5000/proxy/batalBooking", {
+            bookingId,
+        });
+        console.log("Response:", response.data.metadata);
+        if (response.data.metadata.code == 200) {
+            Swal.fire({
+                title: "Deleted!",
+                text: response.data.metadata.message,
+                icon: "success",
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: response.data.metadata.message,
+            });
+        }
     } catch (error) {
-      console.error(
-        "Error:",
-        error.response ? error.response.data : error.message
-      );
+        console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+        );
     }
-  }
+}
+async function batalAntrian(bookingId) {
+    try {
+        const response = await axios.post("http://localhost:5000/proxy/batalAntrian", {
+            bookingId,
+        });
+        console.log("Response:", response.data);
+    } catch (error) {
+        console.error(
+            "Error:",
+            error.response ? error.response.data : error.message
+        );
+    }
+}
 
 document.querySelector("#app").innerHTML = `
             <img
@@ -66,7 +93,7 @@ document.querySelector("#app").innerHTML = `
                                         type="text"
                                         id="bookingId"
                                         placeholder="Masukkan Kode Booking..."
-                                        class="form-control my-3 py-3" />
+                                        class="form-control my-3 py-3"/>
                                     <button
                                         type="button"
                                         class="btn btn-danger"
@@ -109,14 +136,87 @@ document.querySelector("#app").innerHTML = `
 
         <!-- <script type="module">
             import {batalAntrianWeb} from "./batalAntrianWeb.js";
-            </script> -->
+            import { SweetAlert } from './../node_modules/sweetalert2/src/SweetAlert';
+        </script> -->
             
             `;
 
+
+function handleBooking() {
+    const bookingId = document.querySelector("#bookingId").value;
+
+    if (!bookingId) {
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Anda belum memasukkan kode Booking",
+        });
+
+    } else {
+        Swal.fire({
+            title: `NOMOR BOOKING ANDA ADALAH ${bookingId}`,
+            text: "Anda tidak akan bisa mengulang kembali?!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Iya, batalkan",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(`Kode Bookingnya adalah ${bookingId}`);
+                // batalBooking(bookingId);
+                document.querySelector("#bookingId").value = ""; // Clear the input
+            }
+        });
+    }
+}
+
+// Attach the function to the button's click event
+document.getElementById("bookingButton").addEventListener("click", handleBooking);
+
+// Attach the function to the input's keypress event (for Enter key)
+document.querySelector("#bookingId").addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        document.getElementById("bookingButton").click();
+    }
+});
+
+
 // setupCounter(document.querySelector('#counter'))
-// postData(document.querySelector('#bookingId'));
-document
-  .getElementById("bookingButton")
-  .addEventListener("click", () =>
-    postData(document.querySelector("#bookingId").value)
-  );
+// document
+//     .getElementById("bookingButton")
+//     .addEventListener("click", () =>
+//     // postData(document.querySelector("#bookingId").value)
+//     {
+//         if (!document.querySelector("#bookingId").value) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Oops...",
+//                 text: "Anda belum memasukkan kode Booking",
+//             });
+//         } else {
+//             Swal.fire({
+//                 title: "NOMOR BOOKING ANDA ADALAH " + " " + document.querySelector("#bookingId").value,
+//                 text: "Anda tidak akan bisa mengulang kembali?!",
+//                 icon: "warning",
+//                 showCancelButton: true,
+//                 confirmButtonColor: "#3085d6",
+//                 cancelButtonColor: "#d33",
+//                 confirmButtonText: "Iya, batalkan"
+//             }).then((result) => {
+//                 if (result.isConfirmed) {
+//                     console.log("Kode Bookingnya adalah" + " " + document.querySelector("#bookingId").value)
+//                     Swal.fire({
+//                         title: "Deleted!",
+//                         text: "Your file has been deleted.",
+//                         icon: "success"
+//                     });
+//                     document.querySelector("#bookingId").value = ""
+//                 }
+//             });
+//         }
+//     }
+//     );  
