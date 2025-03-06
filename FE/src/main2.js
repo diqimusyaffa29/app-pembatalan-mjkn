@@ -37,7 +37,20 @@ async function batalAntrian(bookingId) {
         const response = await axios.post("http://localhost:5000/proxy/batalAntrian", {
             bookingId,
         });
-        console.log("Response:", response.data);
+        console.log("Response:", response.data.metadata);
+        if (response.data.metadata.code == 200) {
+            Swal.fire({
+                title: "Deleted!",
+                text: response.data.metadata.message,
+                icon: "success",
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: response.data.metadata.message,
+            });
+        }
     } catch (error) {
         console.error(
             "Error:",
@@ -111,13 +124,13 @@ document.querySelector("#app").innerHTML = `
                                 <form action="">
                                     <input
                                         type="text"
-                                        id="kodeantrian"
+                                        id="queueId"
                                         placeholder="Masukkan Kode Antrian..."
                                         class="form-control my-3 py-3" />
                                     <button
                                         type="button"
                                         class="btn btn-danger"
-                                        id="kodeantrianbutton">
+                                        id="queueButton">
                                         Batalkan
                                     </button>
                                 </form>
@@ -181,6 +194,49 @@ document.querySelector("#bookingId").addEventListener("keypress", (event) => {
         event.preventDefault();
         // Trigger the button element with a click
         document.getElementById("bookingButton").click();
+    }
+});
+
+
+
+function handleQueue() {
+    const queueId = document.querySelector("#queueId").value;
+    if (!queueId) {
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Anda belum memasukkan kode Booking",
+        });
+
+    } else {
+        Swal.fire({
+            title: `NOMOR BOOKING ANDA ADALAH ${queueId}`,
+            text: "Anda tidak akan bisa mengulang kembali?!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Iya, batalkan",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(`Kode Bookingnya adalah ${queueId}`);
+                // batalBooking(queueId);
+                document.querySelector("#queueId").value = ""; // Clear the input
+            }
+        });
+    }
+}
+
+// Attach the function to the button's click event
+document.getElementById("queueButton").addEventListener("click", handleQueue);
+
+// Attach the function to the input's keypress event (for Enter key)
+document.querySelector("#queueId").addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        document.getElementById("queueButton").click();
     }
 });
 
