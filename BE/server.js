@@ -2,12 +2,12 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 const CryptoJS = require("crypto-js");
-
+const LZString = require("lz-string")
 const app = express();
 app.use(express.json());
 app.use(cors()); // Mengizinkan semua origin (bisa diatur lebih spesifik)
 
-// Endpoint proxy
+// Endpoint proxy batalBooking
 app.post("/proxy/batalBooking", async (req, res) => {
   try {
     const { bookingId } = req.body;
@@ -42,14 +42,17 @@ app.post("/proxy/batalBooking", async (req, res) => {
   }
 });
 
+
+// Endpoint Proxy batalAntrian
 app.post("/proxy/batalAntrian", async (req, res) => {
   try {
-    const { bookingId } = req.body;
-    console.log("🚀 ~ app.post ~ bookingId:", bookingId);
+    const { queueId } = req.body;
+    console.log("🚀 ~ app.post ~ queueId:", queueId);
     const consid = "30083";
     const password = "0jWEBC4A21";
     const timestamp = Math.floor(Date.now() / 1000);
     const dataSignature = consid + "&" + timestamp;
+    const passphrase = consid + password + timestamp;
 
     const dataSignatureHash = CryptoJS.HmacSHA256(dataSignature, password);
     const signature = CryptoJS.enc.Base64.stringify(dataSignatureHash);
@@ -58,7 +61,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
 
     const response = await axios.post(
       url,
-      { kodebooking: bookingId, keterangan: "Batal" },
+      { kodebooking: queueId,},
       {
         headers: {
           "Content-type": "application/json;charset=UTF-8",
@@ -70,11 +73,45 @@ app.post("/proxy/batalAntrian", async (req, res) => {
       }
     );
 
+    let jsonObj = JSON.parse(JSON.stringify(json));
+    const txtenctypted = jsonObj.response;
+    let txtdecrypted = decrypt(txtenctypted, passphrase);
+
+    let txtDecompressed =
+      LZString.decompressFromEncodedURIComponent(txtdecrypted);
+
+    // Log the decrypted and decompressed response
+    console.log("==============================");
+    console.log("Decrypted Response : " + JSON.stringify(JSON.parse(txtDecompressed), null, 2)
+    );
+
+    function decrypt(encrypted, passphrase) {
+      let key = CryptoJS.SHA256(passphrase);
+      let iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4));
+
+      const decrypted = CryptoJS.AES.decrypt(
+        {
+          ciphertext: CryptoJS.enc.Base64.parse(encrypted), // Parse the base64-encoded encrypted data
+        },
+        key,
+        {
+          iv: iv, // Initialization Vector
+          mode: CryptoJS.mode.CBC, // Cipher Block Chaining mode
+          padding: CryptoJS.pad.Pkcs7, // PKCS7 padding
+        }
+      );
+      return decrypted.toString(CryptoJS.enc.Utf8);
+    }
     res.json(response.data);
   } catch (error) {
+    console.log(error.message)
     res.status(error.response?.status || 500).json({ error: error.message });
   }
 });
+
+
+
+
 
 const PORT = 5000;
 app.listen(PORT, () =>
