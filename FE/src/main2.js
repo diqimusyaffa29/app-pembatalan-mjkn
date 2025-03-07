@@ -144,12 +144,7 @@ document.querySelector("#app").innerHTML = `
                     </div>
                 </div>
             </div>
-            <footer class="mt-5 text-black text-center fs-5 mt-5">
-                <p>
-                    Copyright @2025 All Right Reserved – IT RSI Sultan Agung Banjarbaru
-                </p>
-            </footer>
-        <!-- LZString CDN -->
+            <!-- LZString CDN -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script> -->
 
         <!-- <script type="module">
