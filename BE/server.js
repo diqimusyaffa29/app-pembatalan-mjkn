@@ -61,7 +61,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
 
     const response = await axios.post(
       url,
-      { kodebooking: queueId,},
+      { kodebooking: queueId, },
       {
         headers: {
           "Content-type": "application/json;charset=UTF-8",
@@ -72,36 +72,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
         },
       }
     );
-
-    let jsonObj = JSON.parse(JSON.stringify(json));
-    const txtenctypted = jsonObj.response;
-    let txtdecrypted = decrypt(txtenctypted, passphrase);
-
-    let txtDecompressed =
-      LZString.decompressFromEncodedURIComponent(txtdecrypted);
-
-    // Log the decrypted and decompressed response
-    console.log("==============================");
-    console.log("Decrypted Response : " + JSON.stringify(JSON.parse(txtDecompressed), null, 2)
-    );
-
-    function decrypt(encrypted, passphrase) {
-      let key = CryptoJS.SHA256(passphrase);
-      let iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4));
-
-      const decrypted = CryptoJS.AES.decrypt(
-        {
-          ciphertext: CryptoJS.enc.Base64.parse(encrypted), // Parse the base64-encoded encrypted data
-        },
-        key,
-        {
-          iv: iv, // Initialization Vector
-          mode: CryptoJS.mode.CBC, // Cipher Block Chaining mode
-          padding: CryptoJS.pad.Pkcs7, // PKCS7 padding
-        }
-      );
-      return decrypted.toString(CryptoJS.enc.Utf8);
-    }
+    console.log(response);
     res.json(response.data);
   } catch (error) {
     console.log(error.message)
@@ -109,6 +80,35 @@ app.post("/proxy/batalAntrian", async (req, res) => {
   }
 });
 
+// let jsonObj = JSON.parse(JSON.stringify(json));
+// const txtenctypted = jsonObj.response;
+// let txtdecrypted = decrypt(txtenctypted, passphrase);
+
+// let txtDecompressed =
+//   LZString.decompressFromEncodedURIComponent(txtdecrypted);
+
+// // Log the decrypted and decompressed response
+// console.log("==============================");
+// console.log("Decrypted Response : " + JSON.stringify(JSON.parse(txtDecompressed), null, 2)
+// );
+
+// function decrypt(encrypted, passphrase) {
+//   let key = CryptoJS.SHA256(passphrase);
+//   let iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4));
+
+//   const decrypted = CryptoJS.AES.decrypt(
+//     {
+//       ciphertext: CryptoJS.enc.Base64.parse(encrypted), // Parse the base64-encoded encrypted data
+//     },
+//     key,
+//     {
+//       iv: iv, // Initialization Vector
+//       mode: CryptoJS.mode.CBC, // Cipher Block Chaining mode
+//       padding: CryptoJS.pad.Pkcs7, // PKCS7 padding
+//     }
+//   );
+//   return decrypted.toString(CryptoJS.enc.Utf8);
+// }
 
 
 

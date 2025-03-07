@@ -20,6 +20,7 @@ async function batalBooking(bookingId) {
                 icon: "success",
             });
         } else {
+            console.log(response);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -46,6 +47,7 @@ async function batalAntrian(queueId) {
                 icon: "success",
             });
         } else {
+            // console.log(response);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -126,13 +128,13 @@ document.querySelector("#app").innerHTML = `
                                     <input
                                         type="text"
                                         id="queueId"
-                                        placeholder="DALAM PERBAIKAN"
-                                        class="form-control my-3 py-3" disabled/>
+                                        placeholder="Masukkan Kode Antrian..."
+                                        class="form-control my-3 py-3" />
                                     <button
                                         type="button"
                                         class="btn btn-danger"
                                         id="queueButton"
-                                        disabled
+                                        
                                         >
                                         Batalkan
                                     </button>

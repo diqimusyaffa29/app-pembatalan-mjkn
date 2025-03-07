@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/diqimusyaffa29/app-pembatalan-mjkn/issues"
   },
-  "homepage": "https://github.com/diqimusyaffa29/app-pembatalan-mjkn#readme"
+  "homepage": "https://github.com/diqimusyaffa29/app-pembatalan-mjkn#readme",
+  "dependencies": {
+    "vite-mjkn": "file:"
+  }
 }
