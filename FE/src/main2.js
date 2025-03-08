@@ -7,6 +7,8 @@ import axios from "axios";
 import Swal from 'sweetalert2';
 import LZString from "lz-string"
 
+
+// ======================HIT BE BATALBOOKING START======================
 async function batalBooking(bookingId) {
     try {
         const response = await axios.post("http://localhost:5000/proxy/batalBooking", {
@@ -34,6 +36,9 @@ async function batalBooking(bookingId) {
         );
     }
 }
+// ======================HIT BE BATALBOOKING END======================
+
+// ======================HIT BE BATALANTRIAN START======================
 async function batalAntrian(queueId) {
     try {
         const response = await axios.post("http://localhost:5000/proxy/batalAntrian", {
@@ -61,14 +66,16 @@ async function batalAntrian(queueId) {
         );
     }
 }
+// ======================HIT BE BATALANTRIAN END======================
 
+// ======================FORM START======================
 document.querySelector("#app").innerHTML = `
             <img
                 src="/images/banner.png"
                 alt="RSI Sultan Agung Banjarbaru"
-                class="rounded mx-auto d-block mb-3 mt-5" />
+                class="rounded mx-auto d-block mb-3 mt-4" />
             <div class="border shadow-sm rounded">
-                <div class="p-3">
+                <div class="pt-3">
                     <p class="d-flex justify-content-around">
                         <a
                             class="btn btn-danger"
@@ -154,8 +161,10 @@ document.querySelector("#app").innerHTML = `
 
             
             `;
+// ======================FORM END======================
 
 
+// ======================HIT BATAL BOOKING START======================
 function handleBooking() {
     const bookingId = document.querySelector("#bookingId").value;
     Swal.fire({
@@ -197,9 +206,11 @@ document.querySelector("#bookingId").addEventListener("keypress", (event) => {
         document.getElementById("bookingButton").click();
     }
 });
+// ======================HIT BATAL BOOKING END======================
 
 
 
+// ======================HIT BATAL ANTRIAN START======================
 function handleQueue() {
     const queueId = document.querySelector("#queueId").value;
 
@@ -241,6 +252,10 @@ document.querySelector("#queueId").addEventListener("keypress", (event) => {
         document.getElementById("queueButton").click();
     }
 });
+// ======================HIT BATAL BOOKING END======================
+
+
+
 
 
 // setupCounter(document.querySelector('#counter'))
