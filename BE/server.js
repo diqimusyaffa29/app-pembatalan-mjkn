@@ -36,7 +36,7 @@ app.post("/proxy/batalBooking", async (req, res) => {
         },
       }
     );
-
+    console.log("Response:", response.data);
     res.json(response.data);
   } catch (error) {
     res.status(error.response?.status || 500).json({ error: error.message });

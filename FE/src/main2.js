@@ -11,10 +11,10 @@ import LZString from "lz-string"
 // ======================HIT BE BATALBOOKING START======================
 async function batalBooking(bookingId) {
     try {
-        const response = await axios.post("http://localhost:5000/proxy/batalBooking", {
+        const response = await axios.post("http://175.154.33.223:4005/proxy/batalBooking", {
             bookingId,
         });
-        console.log("Response:", response.data.metadata);
+        // console.log("Response:", response.data.metadata);
         if (response.data.metadata.code == 200) {
             Swal.fire({
                 title: "Deleted!",
@@ -22,7 +22,7 @@ async function batalBooking(bookingId) {
                 icon: "success",
             });
         } else {
-            console.log(response);
+            // console.log(response);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -41,10 +41,10 @@ async function batalBooking(bookingId) {
 // ======================HIT BE BATALANTRIAN START======================
 async function batalAntrian(queueId) {
     try {
-        const response = await axios.post("http://localhost:5000/proxy/batalAntrian", {
+        const response = await axios.post("http://175.154.33.223:4005/proxy/batalAntrian", {
             queueId,
         });
-        console.log("Response:", response.data.metadata);
+        // console.log("Response:", response.data.metadata);
         if (response.data.metadata.code == 200) {
             Swal.fire({
                 title: "Deleted!",
