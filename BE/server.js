@@ -117,7 +117,8 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '/dist', 'index.html'));
 });
 
+const HOST = "175.154.33.223"
 const PORT = 4005;
-app.listen(PORT, () =>
+app.listen(PORT, HOST,  () =>
   console.log(`Server berjalan di http://localhost:${PORT}`)
 );
