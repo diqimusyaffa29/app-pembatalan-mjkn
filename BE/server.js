@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const axios = require("axios");
 const cors = require("cors");
 const CryptoJS = require("crypto-js");
@@ -111,9 +112,12 @@ app.post("/proxy/batalAntrian", async (req, res) => {
 // }
 
 
+app.use(express.static(path.join(__dirname, '/dist')));
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '/dist', 'index.html'));
+});
 
-
-const PORT = 5000;
+const PORT = 4005;
 app.listen(PORT, () =>
   console.log(`Server berjalan di http://localhost:${PORT}`)
 );

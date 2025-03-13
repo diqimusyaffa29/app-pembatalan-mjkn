@@ -167,31 +167,30 @@ document.querySelector("#app").innerHTML = `
 // ======================HIT BATAL BOOKING START======================
 function handleBooking() {
     const bookingId = document.querySelector("#bookingId").value;
-    Swal.fire({
-        title: `NOMOR BOOKING ANDA ADALAH ${bookingId}`,
-        text: "Anda tidak akan bisa mengulang kembali?!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Iya, batalkan",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            console.log(`Kode Bookingnya adalah ${bookingId}`);
-            batalBooking(bookingId);
-            document.querySelector("#bookingId").value = ""; // Clear the input
-        }
-    });
+    if (!bookingId) {
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Anda belum memasukkan kode Booking",
+        });
 
-    // if (!bookingId) {
-    //     Swal.fire({
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text: "Anda belum memasukkan kode Booking",
-    //     });
-
-    // } else {
-    // }
+    } else {
+        Swal.fire({
+            title: `NOMOR BOOKING ANDA ADALAH ${bookingId}`,
+            text: "Anda tidak akan bisa mengulang kembali?!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Iya, batalkan",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(`Kode Bookingnya adalah ${bookingId}`);
+                batalBooking(bookingId);
+                document.querySelector("#bookingId").value = ""; // Clear the input
+            }
+        });
+    }
 }
 
 // Attach the function to the button's click event
@@ -213,31 +212,29 @@ document.querySelector("#bookingId").addEventListener("keypress", (event) => {
 // ======================HIT BATAL ANTRIAN START======================
 function handleQueue() {
     const queueId = document.querySelector("#queueId").value;
-
-    Swal.fire({
-        title: `NOMOR ANTRIAN ANDA ADALAH ${queueId}`,
-        text: "Anda tidak akan bisa mengulang kembali?!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Iya, batalkan",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            console.log(`Kode Antrian adalah ${queueId}`);
-            batalAntrian(queueId);
-            document.querySelector("#queueId").value = ""; // Clear the input
-        }
-    });
-    // if (!queueId) {
-    //     Swal.fire({
-    //         icon: "error",
-    //         title: "Oops...",
-    //         text: "Anda belum memasukkan kode Booking",
-    //     });
-
-    // } else {
-    // }
+    if (!queueId) {
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Anda belum memasukkan kode Booking",
+        });
+    } else {
+        Swal.fire({
+            title: `NOMOR ANTRIAN ANDA ADALAH ${queueId}`,
+            text: "Anda tidak akan bisa mengulang kembali?!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Iya, batalkan",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(`Kode Antrian adalah ${queueId}`);
+                batalAntrian(queueId);
+                document.querySelector("#queueId").value = ""; // Clear the input
+            }
+        });
+    }
 }
 
 // Attach the function to the button's click event
