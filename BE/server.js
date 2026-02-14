@@ -7,16 +7,25 @@ const LZString = require("lz-string")
 const app = express();
 app.use(express.json());
 app.use(cors()); // Mengizinkan semua origin (bisa diatur lebih spesifik)
+const crypto = require("crypto");
 
 // Endpoint proxy batalBooking
 app.post("/proxy/batalBooking", async (req, res) => {
   try {
     const { bookingId } = req.body;
-    console.log("🚀 ~ app.post ~ bookingId:", bookingId);
     const consid = "30083";
     const password = "0jWEBC4A21";
     const timestamp = Math.floor(Date.now() / 1000);
     const dataSignature = consid + "&" + timestamp;
+    const mappedTimeStamp = new Date(timestamp * 1000).toLocaleString(
+      "id-ID",
+      {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "full",
+        timeStyle: "medium",
+      }
+    );
+    console.log(`🚀 ~ app.post ~ bookingId:, ${bookingId} - ${mappedTimeStamp}`);
 
     const dataSignatureHash = CryptoJS.HmacSHA256(dataSignature, password);
     const signature = CryptoJS.enc.Base64.stringify(dataSignatureHash);
@@ -48,21 +57,29 @@ app.post("/proxy/batalBooking", async (req, res) => {
 app.post("/proxy/batalAntrian", async (req, res) => {
   try {
     const { queueId } = req.body;
-    console.log("🚀 ~ app.post ~ queueId:", queueId);
     const consid = "30083";
     const password = "0jWEBC4A21";
     const timestamp = Math.floor(Date.now() / 1000);
     const dataSignature = consid + "&" + timestamp;
     const passphrase = consid + password + timestamp;
+    const mappedTimeStamp = new Date(timestamp * 1000).toLocaleString(
+      "id-ID",
+      {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "full",
+        timeStyle: "medium",
+      }
+    );
+    console.log(`🚀 ~ app.post ~ queueId:, ${queueId} - ${mappedTimeStamp}`);
 
     const dataSignatureHash = CryptoJS.HmacSHA256(dataSignature, password);
     const signature = CryptoJS.enc.Base64.stringify(dataSignatureHash);
 
-    const url = "https://apijkn.bpjs-kesehatan.go.id/antreanrs/antrean/batal";
+    const url = "https://apijkn.bpjs-kesehatan.go.id/antreanrs/antrean/getlisttask";
 
     const response = await axios.post(
       url,
-      { kodebooking: queueId, },
+      { kodebooking: queueId },
       {
         headers: {
           "Content-type": "application/json;charset=UTF-8",
@@ -73,11 +90,44 @@ app.post("/proxy/batalAntrian", async (req, res) => {
         },
       }
     );
-    console.log(response);
-    res.json(response.data);
+    const key = crypto
+      .createHash("sha256")
+      .update(passphrase)
+      .digest()
+
+
+    const iv = key.slice(0, 16)
+
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      key,
+      iv
+    )
+
+    let decrypted = decipher.update(
+      response.data.response,
+      "base64",
+      "utf8"
+    );
+    decrypted += decipher.final("utf8")
+
+    const decompressed =
+      LZString.decompressFromEncodedURIComponent(decrypted);
+
+    const tasks = JSON.parse(decompressed);
+
+    // Kirim ke FE dalam format rapi
+    console.log("Task ID yang sudah dilalui: ",tasks)
+    res.json({
+      metadata: response.data.metadata,
+      tasks: tasks,
+    });
   } catch (error) {
-    console.log(error.message)
-    res.status(error.response?.status || 500).json({ error: error.message });
+    console.log(error.response?.data || error.message);
+
+    res.status(error.response?.status || 500).json({
+      error: error.response?.data || error.message,
+    });
   }
 });
 
@@ -114,11 +164,13 @@ app.post("/proxy/batalAntrian", async (req, res) => {
 
 app.use(express.static(path.join(__dirname, '/dist')));
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '/dist', 'index.html'));
 });
 
-const HOST = "175.154.33.223"
+// const HOST = "175.154.33.223"
+// const PORT = 4005;
+const HOST = "localhost"
 const PORT = 4005;
-app.listen(PORT, HOST,  () =>
+app.listen(PORT, HOST, () =>
   console.log(`Server berjalan di http://localhost:${PORT}`)
 );
