@@ -39,18 +39,41 @@ async function batalBooking(bookingId) {
 // ======================HIT BE BATALBOOKING END======================
 
 // ======================HIT BE BATALANTRIAN START======================
-async function batalAntrian(queueId) {
+async function cekTaskIdStatus(queueId) {
     try {
-        const response = await axios.post("http://175.154.33.223:4005/proxy/batalAntrian", {
+        // const response = await axios.post("http://175.154.33.223:4005/proxy/batalAntrian", {
+        //     queueId,
+        // });
+        const response = await axios.post("http://localhost:4005/proxy/batalAntrian", {
             queueId,
         });
         // console.log("Response:", response.data.metadata);
-        if (response.data.metadata.code == 200) {
-            Swal.fire({
-                title: "Deleted!",
-                text: response.data.metadata.message,
-                icon: "success",
+       if (response.data.metadata.code == 200) {
+
+            const tasks = response.data.tasks;
+
+            let html = "<ul>";
+
+            tasks.forEach(task => {
+                html += `
+                    <li>
+                        Status: ${task.taskname} <br/>
+                        Task ID: ${task.taskid} <br>
+                        Waktu: ${task.waktu}
+                    </li>
+                    <hr>
+                `;
             });
+
+            html += "</ul>";
+
+            Swal.fire({
+                title: "Status Task ID",
+                html: html,
+                icon: "success",
+                width: 600
+            });
+
         } else {
             // console.log(response);
             Swal.fire({
@@ -93,7 +116,7 @@ document.querySelector("#app").innerHTML = `
                             data-bs-target="#multiCollapseExample2"
                             aria-expanded="false"
                             aria-controls="multiCollapseExample2">
-                            Pembatalan Antrian MJKN
+                            Status Task ID MJKN
                         </button>
                         <button
                             class="btn btn-info"
@@ -130,18 +153,17 @@ document.querySelector("#app").innerHTML = `
                     <div class="col">
                         <div class="collapse multi-collapse" id="multiCollapseExample2">
                             <div class="card card-body">
-                                <h2 class="text-center">Pembatalan Antrian MJKN</h2>
+                                <h2 class="text-center">Status Task ID MJKN</h2>
                                 <form action="">
                                     <input
                                         type="text"
                                         id="queueId"
-                                        placeholder="Masukkan Kode Antrian..."
+                                        placeholder="Masukkan Kode Booking..."
                                         class="form-control my-3 py-3" />
                                     <button
                                         type="button"
                                         class="btn btn-danger"
                                         id="queueButton"
-                                        
                                         >
                                         Batalkan
                                     </button>
@@ -210,7 +232,7 @@ document.querySelector("#bookingId").addEventListener("keypress", (event) => {
 
 
 // ======================HIT BATAL ANTRIAN START======================
-function handleQueue() {
+function handleTaskIdChecker() {
     const queueId = document.querySelector("#queueId").value;
     if (!queueId) {
         Swal.fire({
@@ -230,7 +252,7 @@ function handleQueue() {
         }).then((result) => {
             if (result.isConfirmed) {
                 console.log(`Kode Antrian adalah ${queueId}`);
-                batalAntrian(queueId);
+                cekTaskIdStatus(queueId);
                 document.querySelector("#queueId").value = ""; // Clear the input
             }
         });
@@ -238,7 +260,7 @@ function handleQueue() {
 }
 
 // Attach the function to the button's click event
-document.getElementById("queueButton").addEventListener("click", handleQueue);
+document.getElementById("queueButton").addEventListener("click", handleTaskIdChecker);
 
 // Attach the function to the input's keypress event (for Enter key)
 document.querySelector("#queueId").addEventListener("keypress", (event) => {
