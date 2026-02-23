@@ -53,10 +53,10 @@ app.post("/proxy/batalBooking", async (req, res) => {
 });
 
 
-// Endpoint Proxy batalAntrian
-app.post("/proxy/batalAntrian", async (req, res) => {
+// Endpoint Proxy checkStatus
+app.post("/proxy/checkStatus", async (req, res) => {
   try {
-    const { queueId } = req.body;
+    const { bookingId } = req.body;
     const consid = "30083";
     const password = "0jWEBC4A21";
     const timestamp = Math.floor(Date.now() / 1000);
@@ -70,7 +70,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
         timeStyle: "medium",
       }
     );
-    console.log(`🚀 ~ app.post ~ queueId:, ${queueId} - ${mappedTimeStamp}`);
+    console.log(`🚀 ~ app.post ~ queueId:, ${bookingId} - ${mappedTimeStamp}`);
 
     const dataSignatureHash = CryptoJS.HmacSHA256(dataSignature, password);
     const signature = CryptoJS.enc.Base64.stringify(dataSignatureHash);
@@ -79,7 +79,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
 
     const response = await axios.post(
       url,
-      { kodebooking: queueId },
+      { kodebooking: bookingId },
       {
         headers: {
           "Content-type": "application/json;charset=UTF-8",
@@ -117,7 +117,7 @@ app.post("/proxy/batalAntrian", async (req, res) => {
     const tasks = JSON.parse(decompressed);
 
     // Kirim ke FE dalam format rapi
-    console.log("Task ID yang sudah dilalui: ",tasks)
+    console.log("Task ID yang sudah dilalui: ", tasks)
     res.json({
       metadata: response.data.metadata,
       tasks: tasks,
@@ -131,35 +131,49 @@ app.post("/proxy/batalAntrian", async (req, res) => {
   }
 });
 
-// let jsonObj = JSON.parse(JSON.stringify(json));
-// const txtenctypted = jsonObj.response;
-// let txtdecrypted = decrypt(txtenctypted, passphrase);
 
-// let txtDecompressed =
-//   LZString.decompressFromEncodedURIComponent(txtdecrypted);
+// Endpoint proxy updateTaskId
+app.post("/proxy/updateTaskId", async (req, res) => {
+  try {
+    const { bookingId, taskId, miliSecondsDateTime } = req.body;
+    const consid = "30083";
+    const password = "0jWEBC4A21";
+    const timestamp = Math.floor(Date.now() / 1000);
+    const dataSignature = consid + "&" + timestamp;
+    const mappedTimeStamp = new Date(timestamp * 1000).toLocaleString(
+      "id-ID",
+      {
+        timeZone: "Asia/Jakarta",
+        dateStyle: "full",
+        timeStyle: "medium",
+      }
+    );
+    console.log(`🚀 ~ app.post ~ bookingId:, ${bookingId} - ${mappedTimeStamp}`);
 
-// // Log the decrypted and decompressed response
-// console.log("==============================");
-// console.log("Decrypted Response : " + JSON.stringify(JSON.parse(txtDecompressed), null, 2)
-// );
+    const dataSignatureHash = CryptoJS.HmacSHA256(dataSignature, password);
+    const signature = CryptoJS.enc.Base64.stringify(dataSignatureHash);
 
-// function decrypt(encrypted, passphrase) {
-//   let key = CryptoJS.SHA256(passphrase);
-//   let iv = CryptoJS.lib.WordArray.create(key.words.slice(0, 4));
+    const url = "https://apijkn.bpjs-kesehatan.go.id/antreanrs/antrean/updatewaktu";
 
-//   const decrypted = CryptoJS.AES.decrypt(
-//     {
-//       ciphertext: CryptoJS.enc.Base64.parse(encrypted), // Parse the base64-encoded encrypted data
-//     },
-//     key,
-//     {
-//       iv: iv, // Initialization Vector
-//       mode: CryptoJS.mode.CBC, // Cipher Block Chaining mode
-//       padding: CryptoJS.pad.Pkcs7, // PKCS7 padding
-//     }
-//   );
-//   return decrypted.toString(CryptoJS.enc.Utf8);
-// }
+    const response = await axios.post(
+      url,
+      { kodebooking: bookingId, taskid: taskId, waktu: miliSecondsDateTime },
+      {
+        headers: {
+          "Content-type": "application/json;charset=UTF-8",
+          "X-cons-id": consid,
+          "X-Timestamp": timestamp,
+          "X-Signature": signature,
+          "User-Key": "63e8b4496f7c6d94ecb570179aea3cf0",
+        },
+      }
+    );
+    console.log("Response:", response.data);
+    res.json(response.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({ error: error.message });
+  }
+});
 
 
 app.use(express.static(path.join(__dirname, '/dist')));
